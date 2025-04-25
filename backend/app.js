@@ -7,6 +7,8 @@ const cors = require('cors');
 const connectDB  = require('./utils/db');
 const port = 5050;
 
+const authRouter = require('./router/auth-router');
+const projectRouter = require('./router/project-router');
 
 //Cors
 const corsOptions = {
@@ -24,13 +26,8 @@ app.use(express.json());
 
 
 //define routers
-
-
-
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-
+app.use('/api/auth' ,authRouter);
+app.use('/api/project',projectRouter);
 
 
 connectDB().then(()=>{
