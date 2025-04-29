@@ -96,7 +96,6 @@ const removeUsers = async (req, res) => {
 
         // Check if the requester is an admin
         const isAdmin = project.admin.some(adminId => adminId.toString() === req.user.id);
-        console.log(isAdmin)
         if (!isAdmin) {
             return res.status(403).json({ success: false, msg: "Only admin can remove users" });
         }
@@ -120,9 +119,23 @@ const removeUsers = async (req, res) => {
     }
 };
 
+const isAdmin = async (req,res) =>{
+    try {
+        const {projectId} =req.body ;
+        const project = await Project.findOne({ _id: projectId });
 
-const MakeadminUsers = () => {
-    //remove user from user in room and add to Admin 
+        if (!project) {
+            return res.status(404).json({ success: false, msg: "Project not found" });
+        }
+        const isAdmin = project.admin.some(adminId => adminId.toString() === req.user.id);
+        if (!isAdmin) {
+            return res.status(403).json({ success: true, isAdmin:isAdmin });
+        }
+        return res.status(201).json({ success: true, isAdmin:isAdmin});
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, msg: "Internal Server Error" });
+    }
 }
 
 module.exports = {
@@ -130,5 +143,5 @@ module.exports = {
     addUsers,
     getProjects,
     removeUsers,
-    MakeadminUsers
+    isAdmin
 }
