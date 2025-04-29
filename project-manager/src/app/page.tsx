@@ -1,13 +1,9 @@
-import { Button } from "@/components/ui/button";
+import { Toaster } from "sonner";
+import LandingPage from "./pages/LandingPage";
 
 export default function Home() {
-  return (
-  <>
-  <div>
-    <h1>
-      Hello I am Jostan
-      </h1>
-      <Button>Please Help </Button>
-    </div></>
-  );
+  return (<>
+    <LandingPage/>
+    <Toaster/>
+  </>);
 }
