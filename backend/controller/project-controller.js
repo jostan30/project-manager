@@ -58,23 +58,20 @@ const addUsers =async (req,res) => {
         console.log(userExists);
 
         if(userExists._id.equals(user._id)) {
-            res.status(401).json({success:false , msg:"You are admin"});
+            return res.status(401).json({success:false , msg:"You are admin"});
         }
         if(!userExists) {
-            res.status(401).json({success:false , msg:"User not found"});
+            return res.status(401).json({success:false , msg:"User not found"});
         }
 
         const project = await Project.findOne({
             _id: projectId,
-            UserInProject: { $ne: userExists._id }
+            UserInProject: { $ne: userExists._id }   //doesnt allow same user to be added to the project
           });
           
           if (!project) {
             return res.status(400).json({ success: false, msg: "User already in project or project not found" });
           }
-          
-      
-
         project.UserInProject.push(userExists._id);
         await project.save();
 
@@ -87,9 +84,42 @@ const addUsers =async (req,res) => {
     
 }
 
-const removeUsers = () => {
-    //find and remove User
-}
+const removeUsers = async (req, res) => {
+    try {
+        const { projectId, targetUserId } = req.body;
+
+        const project = await Project.findOne({ _id: projectId });
+
+        if (!project) {
+            return res.status(404).json({ success: false, msg: "Project not found" });
+        }
+
+        // Check if the requester is an admin
+        const isAdmin = project.admin.some(adminId => adminId.toString() === req.user.id);
+        console.log(isAdmin)
+        if (!isAdmin) {
+            return res.status(403).json({ success: false, msg: "Only admin can remove users" });
+        }
+        if ( isAdmin &&  req.user.id === targetUserId) {
+            return res.status(402).json({ success: false, msg: "You can cannot delete yourself" });
+        }
+
+
+        // Remove targetUserId from UserInProject array
+        project.UserInProject = project.UserInProject.filter(
+            (user) => user.toString() !== targetUserId
+        );
+
+        await project.save();
+
+        return res.status(200).json({ success: true, msg: "User removed from project" });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, msg: "Internal Server Error" });
+    }
+};
+
 
 const MakeadminUsers = () => {
     //remove user from user in room and add to Admin 

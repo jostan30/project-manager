@@ -10,7 +10,6 @@ router.get('/',getProjects);
 
 router.put('/add' ,addUsers); //admin access
 router.put('/remove' ,removeUsers); //admin access
-router.put('/Makeadmin' ,MakeadminUsers); //admin access
 
 
 
