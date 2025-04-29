@@ -2,6 +2,26 @@ const mongoose = require('mongoose');
 const User = require("../models/User");
 const Project = require("../models/Project");
 
+const getProjectById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const project = await Project.findById(id)
+            .populate('admin', 'name email') // optional
+            .populate('UserInProject', 'name email'); // optional
+
+        if (!project) {
+            return res.status(404).json({ success: false, msg: "Project not found" });
+        }
+
+        res.status(200).json({ success: true, project });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, msg: "Server Side Error" });
+    }
+};
+
+
 const createProject = async (req, res) => {
     try {
         //create Project and become Admin by default
@@ -143,5 +163,6 @@ module.exports = {
     addUsers,
     getProjects,
     removeUsers,
-    isAdmin
+    isAdmin,
+    getProjectById
 }
